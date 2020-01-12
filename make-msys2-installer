@@ -124,7 +124,7 @@ create_chroot_system() {
 }
 
 if [ ! -f "${_archivegen}" ]; then
-  eval "pacman -S --noconfirm mingw${_bitness}/mingw-w64-${_arch}-qt-installer-framework-git" | tee -a ${_log}
+  eval "pacman -S --noconfirm mingw${_bitness}/mingw-w64-${_arch}-qt-installer-framework" | tee -a ${_log}
 fi
 
 if [ ! -f "${_archivegen}" ]; then
