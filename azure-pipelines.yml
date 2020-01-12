@@ -1,16 +1,57 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+schedules:
+  - cron: '0 0 * * 0'
+    displayName: weekly build
+    branches:
+      include:
+      - master
+    always: true
 
-pool:
-  vmImage: 'windows-2019'
-
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+jobs:
+  - job: MSYS
+    timeoutInMinutes: 360
+    pool:
+      vmImage: 'windows-2019'
+    strategy:
+      maxParallel: 5
+      matrix:
+        i686:
+          MSYS_DIR: msys32
+          BASE_REPO: msys2-ci-base-i686
+        x86_64:
+          MSYS_DIR: msys64
+          BASE_REPO: msys2-ci-base
+    steps:
+      - script: |
+          git clone https://github.com/msys2/$(BASE_REPO).git %CD:~0,2%\$(MSYS_DIR)
+        displayName: Install MSYS2
+      - script: |
+          set PATH=%CD:~0,2%\$(MSYS_DIR)\usr\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem
+          %CD:~0,2%\$(MSYS_DIR)\usr\bin\pacman --noconfirm -Syyuu
+          %CD:~0,2%\$(MSYS_DIR)\usr\bin\pacman --noconfirm -Syuu
+        displayName: Update MSYS2
+      - script: |
+          set CHERE_INVOKING=yes
+          set PATH=C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem
+          %CD:~0,2%\$(MSYS_DIR)\usr\bin\bash -lc "bash make-msys2-installer"
+        displayName: CI-Build
+      - task: CopyFiles@2
+        inputs:
+          contents: 'msys2-*'
+          targetFolder: $(Build.ArtifactStagingDirectory)
+        displayName: Copy installer
+      - task: GithubRelease@0
+        inputs:
+          githubConnection: 'msys2-installer-release-connection'
+          action: 'edit'
+          tag: 'nightly'
+          assets: '$(Build.ArtifactStagingDirectory)/*'
+          assetUploadMode: 'replace'
+          addChangeLog: false
+        displayName: 'Create GitHub Release'
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      - task: PublishBuildArtifacts@1
+        displayName: Publish packages
+        inputs:
+          pathtoPublish: $(Build.ArtifactStagingDirectory)
+          artifactName: $(MSYS_DIR)
+        condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
