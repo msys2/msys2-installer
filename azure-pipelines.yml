@@ -48,10 +48,10 @@ jobs:
           assetUploadMode: 'replace'
           addChangeLog: false
         displayName: 'Create GitHub Release'
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))
       - task: PublishBuildArtifacts@1
         displayName: Publish packages
         inputs:
           pathtoPublish: $(Build.ArtifactStagingDirectory)
           artifactName: $(MSYS_DIR)
-        condition: and(succeeded(), ne(variables['Build.SourceBranch'], 'refs/heads/master'))
+        condition: and(succeeded(), or(ne(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.Reason'], 'PullRequest')))
