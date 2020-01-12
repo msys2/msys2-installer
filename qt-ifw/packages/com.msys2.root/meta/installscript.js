@@ -4,7 +4,9 @@ function Component() {
     if (systemDrive === "") {
         systemDrive = "C:";
     }
-    installer.setValue("TargetDir", systemDrive+"\\msys@BITNESS@");
+    var targetDir = installer.value("TargetDir", systemDrive+"\\msys@BITNESS@")
+
+    installer.setValue("TargetDir", targetDir);
     installer.setDefaultPageVisible(QInstaller.Introduction, false);
     installer.setDefaultPageVisible(QInstaller.TargetDirectory, true);
     installer.setDefaultPageVisible(QInstaller.ComponentSelection, false);
