@@ -17,9 +17,11 @@ jobs:
         i686:
           MSYS_DIR: msys32
           BASE_REPO: msys2-ci-base-i686
+          ARCH: i686
         x86_64:
           MSYS_DIR: msys64
           BASE_REPO: msys2-ci-base
+          ARCH: x86_64
     steps:
       - script: |
           git clone https://github.com/msys2/$(BASE_REPO).git %CD:~0,2%\$(MSYS_DIR)
@@ -32,7 +34,7 @@ jobs:
       - script: |
           set CHERE_INVOKING=yes
           set PATH=C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem
-          %CD:~0,2%\$(MSYS_DIR)\usr\bin\bash -lc "bash make-msys2-installer"
+          %CD:~0,2%\$(MSYS_DIR)\usr\bin\bash -lc "bash make-msys2-installer; cp msys2-*.exe msys2-$(ARCH)-latest.exe; cp msys2-*.tar.xz msys2-base-$(ARCH)-latest.tar.xz"
         displayName: CI-Build
       - task: CopyFiles@2
         inputs:
@@ -43,9 +45,9 @@ jobs:
         inputs:
           githubConnection: 'msys2-installer-release-connection'
           action: 'edit'
-          tag: 'nightly'
+          tag: nightly-$(ARCH)
           assets: '$(Build.ArtifactStagingDirectory)/*'
-          assetUploadMode: 'replace'
+          assetUploadMode: 'delete'
           addChangeLog: false
         displayName: 'Create GitHub Release'
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'PullRequest'))
