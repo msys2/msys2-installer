@@ -1,14 +1,16 @@
 // Run with:
 // ./msys2-x86_64-$(date +'%Y%m%d').exe --platform minimal --script auto-install.js -v
+// To specify the installation directory, add InstallPrefix="C:\custom_install\path\"
 // Currently it gets stuck on the last page.
 // To see graphically what's happening, remove "--platform minimal"
+
+var install_dir = installer.value("InstallPrefix")
 
 function Controller()
 {
     print("(print) Hello Installer World!\n");
     console.log("(console.log) Hello Installer World!\n");
     installer.setDefaultPageVisible(QInstaller.Introduction, true);
-    installer.setDefaultPageVisible(QInstaller.TargetDirectory, false);
 
     var page = gui.pageWidgetByObjectName( "ComponentSelectionPage" );
     page.selectComponent( "com.msys2.root" );
@@ -27,13 +29,23 @@ function Controller()
                                       QMessageBox.Yes | QMessageBox.No);
 
     console.log("(console.log) result " + result);
-    installer.setDefaultPageVisible(QInstaller.TargetDirectory, false);
-
+ 
     installer.setMessageBoxAutomaticAnswer("OverwriteTargetDirectory", QMessageBox.Yes);
     installer.setMessageBoxAutomaticAnswer("stopProcessesForUpdates", QMessageBox.Ignore);
 }
 
 Controller.prototype.IntroductionPageCallback = function()
+{
+    gui.clickButton(buttons.NextButton);
+}
+
+Controller.prototype.TargetDirectoryPageCallback = function()
+{
+    gui.currentPageWidget().TargetDirectoryLineEdit.setText(install_dir);
+    gui.clickButton(buttons.NextButton);
+}
+
+Controller.prototype.StartMenuDirectoryPageCallback = function()
 {
     gui.clickButton(buttons.NextButton);
 }
