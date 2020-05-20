@@ -14,10 +14,6 @@ jobs:
     strategy:
       maxParallel: 5
       matrix:
-        i686:
-          MSYS_DIR: msys32
-          BASE_REPO: msys2-ci-base-i686
-          ARCH: i686
         x86_64:
           MSYS_DIR: msys64
           BASE_REPO: msys2-ci-base
