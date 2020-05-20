@@ -9,6 +9,7 @@ _dateqif=$(date +'%Y-%m-%d')
 _version=${_date}
 _filename=msys2-${_arch}-${_date}.exe
 _filename2=msys2-base-${_arch}-${_date}.tar.xz
+_filename3=msys2-base-${_arch}-${_date}.sfx.exe
 _log=/tmp/installer-${_arch}-${_date}.log
 if [ "${_arch}" = "x86_64" ]; then
   _bitness=64
@@ -88,6 +89,11 @@ create_archives() {
       else
             die "MSYS2 compressing fail. See ${_log}"
       fi
+
+      # self extracting cli 7z archive
+      7z a -mx=9  "${_thisdir}/_temp.7z" "msys${_bitness}"
+      cat ${_thisdir}/7zCon.sfx "${_thisdir}/_temp.7z" > "${_thisdir}/${_filename3}"
+      rm "${_thisdir}/_temp.7z"
     popd > /dev/null
   fi
 }

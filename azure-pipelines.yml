@@ -26,11 +26,12 @@ jobs:
           set PATH=%CD:~0,2%\$(MSYS_DIR)\usr\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem
           %CD:~0,2%\$(MSYS_DIR)\usr\bin\pacman --noconfirm -Syyuu
           %CD:~0,2%\$(MSYS_DIR)\usr\bin\pacman --noconfirm -Syuu
+          %CD:~0,2%\$(MSYS_DIR)\usr\bin\pacman --noconfirm -S p7zip
         displayName: Update MSYS2
       - script: |
           set CHERE_INVOKING=yes
           set PATH=C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem
-          %CD:~0,2%\$(MSYS_DIR)\usr\bin\bash -lc "bash make-msys2-installer; cp msys2-*.exe msys2-$(ARCH)-latest.exe; cp msys2-*.tar.xz msys2-base-$(ARCH)-latest.tar.xz"
+          %CD:~0,2%\$(MSYS_DIR)\usr\bin\bash -lc "bash make-msys2-installer; cp msys2-base-$(ARCH)-[0-9]*.sfx.exe msys2-base-$(ARCH)-latest.sfx.exe; cp msys2-$(ARCH)-[0-9]*.exe msys2-$(ARCH)-latest.exe; cp msys2-*.tar.xz msys2-base-$(ARCH)-latest.tar.xz"
         displayName: CI-Build
       - task: CopyFiles@2
         inputs:
