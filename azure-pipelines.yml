@@ -20,10 +20,11 @@ jobs:
           ARCH: x86_64
     steps:
       - powershell: |
-          (New-Object Net.WebClient).DownloadFile("https://github.com/msys2/msys2-installer/releases/download/2020-05-22/msys2-base-x86_64-20200522.sfx.exe", "sfx.exe")
+          (New-Object Net.WebClient).DownloadFile("https://github.com/msys2/msys2-installer/releases/download/2020-06-29/msys2-base-x86_64-20200629.sfx.exe", "sfx.exe")
         displayName: Download MSYS2
       - script: |
           sfx.exe -y -o%CD:~0,2%\
+          %CD:~0,2%\$(MSYS_DIR)\usr\bin\bash -lc " "
           %CD:~0,2%\$(MSYS_DIR)\usr\bin\bash -lc "pacman --noconfirm -Syuu"
           %CD:~0,2%\$(MSYS_DIR)\usr\bin\bash -lc "pacman --noconfirm -Syuu"
         displayName: Extract/Install/Update MSYS2
