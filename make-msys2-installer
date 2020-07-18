@@ -59,43 +59,36 @@ create_archives() {
   local _data="${_ifwroot}"/packages/com.msys2.root.base/data
   [ -d "${_data}" ] && rm -rf "${_data}"
   mkdir -p "${_data}"
-  local _dirs=
-  for curr_dir in /dev /etc /var /tmp /usr /mingw32 /mingw64 /msys2_shell.cmd /msys2.exe /mingw32.exe /mingw64.exe /msys2.ini /mingw32.ini /mingw64.ini /msys2.ico /autorebase.bat autorebasebase1st.bat; do
-    if [[ -d ${_newmsys}${curr_dir} || -f ${_newmsys}${curr_dir} ]]; then
-      _dirs="${_dirs} ${_newmsys}$curr_dir"
+
+  local _dirs="${_newmsys}/"*
+  local _compress_cmd="${_archivegen} ${_data}/msys${_bitness}.7z ${_dirs}"
+  pushd / > /dev/null
+    echo "Run: ${_compress_cmd} ..." | tee -a ${_log}
+    eval "${_compress_cmd}" 2>&1 | tee -a ${_log}
+    _result=$?
+    if [ "${_result}" -eq "0" ]; then
+          echo " archivegen succeeded. Created ${_data}/msys${_bitness}.7z" | tee -a ${_log}
+    else
+          exit_cleanly "3" "archivegen failed. See ${_log}"
     fi
-  done
+  popd > /dev/null
 
-  if [ -n "${_dirs}" ]; then
-    local _compress_cmd="${_archivegen} ${_data}/msys${_bitness}.7z ${_dirs}"
-    pushd / > /dev/null
-      echo "Run: ${_compress_cmd} ..." | tee -a ${_log}
-      eval "${_compress_cmd}" 2>&1 | tee -a ${_log}
-      _result=$?
-      if [ "${_result}" -eq "0" ]; then
-            echo " archivegen succeeded. Created ${_data}/msys${_bitness}.7z" | tee -a ${_log}
-      else
-            exit_cleanly "3" "archivegen failed. See ${_log}"
-      fi
-    popd > /dev/null
+  pushd ${_newmsysbase} > /dev/null
+    local _compress_cmd2="/usr/bin/tar --transform='s/:/_/g' --dereference --hard-dereference -cJf ${_thisdir}/${_filename2} msys${_bitness}"
+    echo "Run: ${_compress_cmd2} ..." | tee -a ${_log}
+    eval "${_compress_cmd2}" 2>&1 | tee -a ${_log}
+    _result=$?
+    if [ "${_result}" -eq "0" ]; then
+          echo " tar succeeded. Created " | tee -a ${_log}
+    else
+          die "MSYS2 compressing fail. See ${_log}"
+    fi
 
-    pushd ${_newmsysbase} > /dev/null
-      local _compress_cmd2="/usr/bin/tar --transform='s/:/_/g' --dereference --hard-dereference -cJf ${_thisdir}/${_filename2} msys${_bitness}"
-      echo "Run: ${_compress_cmd2} ..." | tee -a ${_log}
-      eval "${_compress_cmd2}" 2>&1 | tee -a ${_log}
-      _result=$?
-      if [ "${_result}" -eq "0" ]; then
-            echo " tar succeeded. Created " | tee -a ${_log}
-      else
-            die "MSYS2 compressing fail. See ${_log}"
-      fi
-
-      # self extracting cli 7z archive
-      7z a -mx=9  "${_thisdir}/_temp.7z" "msys${_bitness}"
-      cat ${_thisdir}/7zCon.sfx "${_thisdir}/_temp.7z" > "${_thisdir}/${_filename3}"
-      rm "${_thisdir}/_temp.7z"
-    popd > /dev/null
-  fi
+    # self extracting cli 7z archive
+    7z a -mx=9  "${_thisdir}/_temp.7z" "msys${_bitness}"
+    cat ${_thisdir}/7zCon.sfx "${_thisdir}/_temp.7z" > "${_thisdir}/${_filename3}"
+    rm "${_thisdir}/_temp.7z"
+  popd > /dev/null
 }
 
 # Add -v to get more information.
