@@ -61,7 +61,7 @@ create_archives() {
   mkdir -p "${_data}"
 
   local _dirs="${_newmsys}/"*
-  local _compress_cmd="${_archivegen} ${_data}/msys${_bitness}.7z ${_dirs}"
+  local _compress_cmd="${_archivegen} --compression 9 ${_data}/msys${_bitness}.7z ${_dirs}"
   pushd / > /dev/null
     echo "Run: ${_compress_cmd} ..." | tee -a ${_log}
     eval "${_compress_cmd}" 2>&1 | tee -a ${_log}
