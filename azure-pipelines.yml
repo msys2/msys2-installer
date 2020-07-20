@@ -33,7 +33,7 @@ jobs:
         displayName: Install deps
       - script: |
           set CHERE_INVOKING=yes
-          %CD:~0,2%\$(MSYS_DIR)\usr\bin\bash -lc "bash make-msys2-installer; cp msys2-base-$(ARCH)-[0-9]*.sfx.exe msys2-base-$(ARCH)-latest.sfx.exe; cp msys2-$(ARCH)-[0-9]*.exe msys2-$(ARCH)-latest.exe; cp msys2-*.tar.xz msys2-base-$(ARCH)-latest.tar.xz"
+          %CD:~0,2%\$(MSYS_DIR)\usr\bin\bash -lc "bash make-msys2-installer; sha256sum.exe msys2-*; sha256sum.exe msys2-* > msys2-checksums.txt; cp msys2-base-$(ARCH)-[0-9]*.sfx.exe msys2-base-$(ARCH)-latest.sfx.exe; cp msys2-$(ARCH)-[0-9]*.exe msys2-$(ARCH)-latest.exe; cp msys2-*.tar.xz msys2-base-$(ARCH)-latest.tar.xz"
         displayName: CI-Build
       - task: CopyFiles@2
         inputs:
