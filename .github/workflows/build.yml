@@ -1,0 +1,54 @@
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  build-installer:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: setup-msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MSYS
+          update: true
+          install: p7zip tar mingw-w64-x86_64-qt-installer-framework
+
+      - name: Build Installer
+        shell: msys2 {0}
+        run: |
+          bash make-msys2-installer
+          sha256sum.exe msys2-*
+          sha256sum.exe msys2-* > msys2-checksums.txt
+
+      - name: Upload Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: installer
+          path: msys2-*
+
+  upload-nightly:
+    needs: build-installer
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: installer
+
+      - name: Create 'latest' Variants
+        run: |
+          cp msys2-base-x86_64-[0-9]*.sfx.exe msys2-base-x86_64-latest.sfx.exe
+          cp msys2-x86_64-[0-9]*.exe msys2-x86_64-latest.exe
+          cp msys2-*.tar.xz msys2-base-x86_64-latest.tar.xz
+
+      - uses: eine/tip@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: nightly-x86_64
+          rm: true
+          files: msys2-*
