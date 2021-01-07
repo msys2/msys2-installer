@@ -1,10 +1,10 @@
 // Run with:
 // ./msys2-x86_64-$(date +'%Y%m%d').exe --platform minimal --script auto-install.js -v
-// To specify the installation directory, add InstallPrefix="C:\custom_install\path\"
+// To specify the installation directory, add InstallDir="C:\custom_install\path\"
 // Currently it gets stuck on the last page.
 // To see graphically what's happening, remove "--platform minimal"
 
-var install_dir = installer.value("InstallPrefix")
+var install_dir = installer.value("InstallDir")
 
 function Controller()
 {
@@ -41,6 +41,9 @@ Controller.prototype.IntroductionPageCallback = function()
 
 Controller.prototype.TargetDirectoryPageCallback = function()
 {
+    if (!install_dir) {
+        install_dir = "C:/MSYS64"
+    }
     gui.currentPageWidget().TargetDirectoryLineEdit.setText(install_dir);
     gui.clickButton(buttons.NextButton);
 }
@@ -71,9 +74,6 @@ Controller.prototype.InstallationFinishedPageCallback = function()
 Controller.prototype.FinishedPageCallback = function()
 {
     console.log("(console.log) FinishedPageCallback ");
-//    var checkBox = gui.pageWidgetByObjectName("RunItCheckBox");
-//    console.log("typeof checkBox is " + typeof checkBox);
-//    assert(typeof checkBox === 'object');
 
     var page = gui.pageWidgetByObjectName("FinishedPage");
     page.RunItCheckBox.checked = false;
