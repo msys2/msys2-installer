@@ -21,6 +21,20 @@ jobs:
           update: true
           install: p7zip tar mingw-w64-x86_64-qt-installer-framework
 
+    - name: Switch to the main mirror
+      shell: msys2 {0}
+      run: |
+        sed -e "s|Include = /etc/pacman.d/mirrorlist.mingw32|Server = http://repo.msys2.org/mingw/i686/|g" -i /etc/pacman.conf
+        sed -e "s|Include = /etc/pacman.d/mirrorlist.mingw64|Server = http://repo.msys2.org/mingw/x86_64/|g" -i /etc/pacman.conf
+        sed -e "s|Include = /etc/pacman.d/mirrorlist.msys|Server = http://repo.msys2.org/msys/\$arch/|g" -i /etc/pacman.conf
+        pacman-conf.exe
+
+    - name: Update using the main mirror & Check install
+      run: |
+        msys2 -c 'pacman --noconfirm -Suuy'
+        msys2 -c 'pacman --noconfirm -Suu'
+        msys2 -c 'pacman -Qkq'
+
       - name: Build Installer
         shell: msys2 {0}
         run: |
