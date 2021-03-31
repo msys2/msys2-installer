@@ -20,6 +20,7 @@ function createShortcuts()
     var cmdLocation = installer.value("TargetDir") + "\\msys2_shell.cmd";
     component.addOperation("CreateShortcut", cmdLocation, "@StartMenuDir@/MSYS2 MinGW 32-bit.lnk", "-mingw32", "iconPath=@TargetDir@/mingw32.exe");
     component.addOperation("CreateShortcut", cmdLocation, "@StartMenuDir@/MSYS2 MinGW 64-bit.lnk", "-mingw64", "iconPath=@TargetDir@/mingw64.exe");
+    component.addOperation("CreateShortcut", cmdLocation, "@StartMenuDir@/MSYS2 MinGW UCRT 64-bit.lnk", "-ucrt64", "iconPath=@TargetDir@/ucrt64.exe");
     component.addOperation("CreateShortcut", cmdLocation, "@StartMenuDir@/MSYS2 MSYS.lnk", "-msys", "iconPath=@TargetDir@/msys2.exe");
 
     if ("@BITNESS@bit" === "32bit") {
