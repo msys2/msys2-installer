@@ -49,6 +49,8 @@ jobs:
           path: msys2-*
 
   upload-nightly:
+    permissions:
+      contents: write
     needs: build-installer
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
