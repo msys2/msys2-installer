@@ -11,7 +11,7 @@
     <InstallerApplicationIcon>../../msys2</InstallerApplicationIcon>
     <InstallerWindowIcon>../../msys2</InstallerWindowIcon>
     <InstallActionColumnVisible>false</InstallActionColumnVisible>
-    <MaintenanceToolName>Uninstall_MSYS2</MaintenanceToolName>
+    <MaintenanceToolName>Uninstall</MaintenanceToolName>
     <SupportsModify>false</SupportsModify>
     <RepositorySettingsPageVisible>false</RepositorySettingsPageVisible>
     <SaveDefaultRepositories>false</SaveDefaultRepositories>
