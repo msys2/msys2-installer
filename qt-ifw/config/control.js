@@ -4,10 +4,10 @@ function Controller()
 
 Controller.prototype.IntroductionPageCallback = function()
 {
-  var widget = gui.currentPageWidget();
-  radioNames = ["PackageManagerRadioButton", "UpdaterRadioButton"];
-  for (name of radioNames) {
-    var el = gui.findChild(widget, name);
+  const widget = gui.currentPageWidget();
+  const radioNames = ["PackageManagerRadioButton", "UpdaterRadioButton"];
+  for (const name of radioNames) {
+    const el = gui.findChild(widget, name);
     if (el != null) {
       el.hide();
     }
