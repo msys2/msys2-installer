@@ -71,3 +71,19 @@ jobs:
           tag: nightly-x86_64
           rm: true
           files: msys2-*
+
+  build-docker:
+    needs: upload-nightly
+    if: github.ref == 'refs/heads/master'
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build image
+        run: |
+          Get-Content Dockerfile | docker build -t msys2-base -
+
+      - name: Test
+        run: |
+          docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman --version"
