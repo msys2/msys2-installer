@@ -42,16 +42,119 @@ jobs:
           sha256sum.exe msys2-*
           sha256sum.exe msys2-* > msys2-checksums.txt
 
+      - name: Create 'latest' Variants
+        run: |
+          cp msys2-base-x86_64-[0-9]*.sfx.exe msys2-base-x86_64-latest.sfx.exe
+          cp msys2-x86_64-[0-9]*.exe msys2-x86_64-latest.exe
+          cp msys2-*.tar.xz msys2-base-x86_64-latest.tar.xz
+
       - name: Upload Results
         uses: actions/upload-artifact@v2
         with:
           name: installer
           path: msys2-*
 
+  test-installer-2019:
+    needs: build-installer
+    runs-on: windows-2019
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: installer
+
+      - name: Install
+        run: |
+          ./msys2-x86_64-latest.exe in --confirm-command --accept-messages --root C:/msys2-install-test
+
+      - name: Test
+        run: |
+          C:\msys2-install-test\usr\bin\bash.exe -lc "pacman --version"
+          C:\msys2-install-test\usr\bin\bash.exe -lc "pacman -Qkv"
+          C:\msys2-install-test\usr\bin\bash.exe -lc "pacman -Syy"
+
+      - name: Uninstall
+        run: |
+          C:\msys2-install-test\uninstall.exe pr --confirm-command
+
+  test-installer-2016:
+    needs: build-installer
+    runs-on: windows-2016
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: installer
+
+      - name: Install
+        run: |
+          ./msys2-x86_64-latest.exe in --confirm-command --accept-messages --root C:/msys2-install-test
+
+      - name: Test
+        run: |
+          C:\msys2-install-test\usr\bin\bash.exe -lc "pacman --version"
+          C:\msys2-install-test\usr\bin\bash.exe -lc "pacman -Qkv"
+          C:\msys2-install-test\usr\bin\bash.exe -lc "pacman -Syy"
+
+      - name: Uninstall
+        run: |
+          C:\msys2-install-test\uninstall.exe pr --confirm-command
+
+  test-docker-sfx-2019:
+    needs: build-installer
+    runs-on: windows-2019
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: installer
+
+      - name: Build image
+        run: |
+          docker build -t msys2-base -f ./.ci/Dockerfile.2019 .
+
+      - name: Test
+        run: |
+          docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman --version"
+          docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman -Qkv"
+          docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman -Syy"
+
+  test-docker-sfx-2016:
+    needs: build-installer
+    runs-on: windows-2016
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: installer
+
+      - name: Build image
+        run: |
+          docker build -t msys2-base -f ./.ci/Dockerfile.2016 .
+
+      - name: Test
+        run: |
+          docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman --version"
+          docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman -Qkv"
+          docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman -Syy"
+
   upload-nightly:
     permissions:
       contents: write
-    needs: build-installer
+    needs:
+      - build-installer
+      - test-docker-sfx-2019
+      - test-docker-sfx-2016
+      - test-installer-2016
+      - test-installer-2019
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
@@ -59,31 +162,9 @@ jobs:
         with:
           name: installer
 
-      - name: Create 'latest' Variants
-        run: |
-          cp msys2-base-x86_64-[0-9]*.sfx.exe msys2-base-x86_64-latest.sfx.exe
-          cp msys2-x86_64-[0-9]*.exe msys2-x86_64-latest.exe
-          cp msys2-*.tar.xz msys2-base-x86_64-latest.tar.xz
-
       - uses: eine/tip@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: nightly-x86_64
           rm: true
           files: msys2-*
-
-  build-docker:
-    needs: upload-nightly
-    if: github.ref == 'refs/heads/master'
-    runs-on: windows-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build image
-        run: |
-          Get-Content Dockerfile | docker build -t msys2-base -
-
-      - name: Test
-        run: |
-          docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman --version"
