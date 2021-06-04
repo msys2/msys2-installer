@@ -10,19 +10,19 @@ https://github.com/msys2/msys2-installer/releases/tag/nightly-x86_64
 
 Installing the GUI installer via the CLI to `C:\msys64`:
 
-```
+```powershell
 .\msys2-x86_64-latest.exe in --confirm-command --accept-messages --root C:/msys64
 ```
 
 Uninstalling an existing installation in `C:\msys64` via the CLI:
 
-```
+```powershell
 C:\msys64\uninstall.exe pr --confirm-command
 ```
 
 Installing the self extracting archive to `C:\msys64`:
 
-```
+```powershell
 .\msys2-base-x86_64-latest.sfx.exe -y -oC:\
 ```
 
