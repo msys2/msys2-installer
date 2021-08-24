@@ -54,6 +54,31 @@ jobs:
           name: installer
           path: msys2-*
 
+  test-installer-2022:
+    needs: build-installer
+    runs-on: windows-2022
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: installer
+
+      - name: Install
+        run: |
+          ./msys2-x86_64-latest.exe in --confirm-command --accept-messages --root C:/msys2-install-test
+
+      - name: Test
+        run: |
+          C:\msys2-install-test\usr\bin\bash.exe -lc "pacman --version"
+          C:\msys2-install-test\usr\bin\bash.exe -lc "pacman -Qkv"
+          C:\msys2-install-test\usr\bin\bash.exe -lc "pacman -Syy"
+
+      - name: Uninstall
+        run: |
+          C:\msys2-install-test\uninstall.exe pr --confirm-command
+
   test-installer-2019:
     needs: build-installer
     runs-on: windows-2019
