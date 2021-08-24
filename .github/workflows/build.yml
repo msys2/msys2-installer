@@ -180,6 +180,7 @@ jobs:
       - test-docker-sfx-2016
       - test-installer-2016
       - test-installer-2019
+      - test-installer-2022
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
