@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+
+COPY ./msys2-base-x86_64-latest.sfx.exe /msys2.exe
+
+RUN powershell -Command \
+  $ErrorActionPreference = 'Stop'; \
+  $ProgressPreference = 'SilentlyContinue'; \
+  /msys2.exe -y -oC:\; \
+  function msys() { C:\msys64\usr\bin\bash.exe @('-lc') + @Args; } \
+  msys ' '; \
+  msys 'pacman --noconfirm -Syuu'; \
+  msys 'pacman --noconfirm -Syuu'; \
+  msys 'pacman --noconfirm -Scc';
