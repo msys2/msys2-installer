@@ -125,7 +125,7 @@ jobs:
         with:
           name: installer
 
-      - uses: eine/tip@master
+      - uses: eine/tip@e552fa107d34f64b2df016c
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: nightly-x86_64
