@@ -125,9 +125,8 @@ jobs:
         with:
           name: installer
 
-      - uses: eine/tip@master
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: nightly-x86_64
-          rm: true
-          files: msys2-*
+      - name: Upload Installers
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload nightly-x86_64 msys2-* --clobber -R ${{ github.repository }}
