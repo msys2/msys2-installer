@@ -26,9 +26,8 @@ jobs:
       - name: Switch to the main mirror
         shell: msys2 {0}
         run: |
-          sed -e "s|Include = /etc/pacman.d/mirrorlist.mingw32|Server = http://repo.msys2.org/mingw/i686/|g" -i /etc/pacman.conf
-          sed -e "s|Include = /etc/pacman.d/mirrorlist.mingw64|Server = http://repo.msys2.org/mingw/x86_64/|g" -i /etc/pacman.conf
-          sed -e "s|Include = /etc/pacman.d/mirrorlist.msys|Server = http://repo.msys2.org/msys/\$arch/|g" -i /etc/pacman.conf
+          echo 'Server = https://repo.msys2.org/mingw/$repo/' > /etc/pacman.d/mirrorlist.mingw
+          echo 'Server = https://repo.msys2.org/msys/$arch/' > /etc/pacman.d/mirrorlist.msys
           pacman-conf.exe
 
       - name: Update using the main mirror & Check install
