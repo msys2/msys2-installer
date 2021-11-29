@@ -85,9 +85,7 @@ create_archives() {
     fi
 
     # self extracting cli 7z archive
-    7z a -mx=9  "${_thisdir}/_temp.7z" "msys${_bitness}"
-    cat ${_thisdir}/7zCon.sfx "${_thisdir}/_temp.7z" > "${_thisdir}/${_filename3}"
-    rm "${_thisdir}/_temp.7z"
+    "${_thisdir}/create-sfx.sh" "msys${_bitness}" "${_thisdir}/${_filename3}"
   popd > /dev/null
 }
 
