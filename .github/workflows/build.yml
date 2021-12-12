@@ -62,7 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2016, 2019, 2022]
+        image: [2019, 2022]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -92,7 +92,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2016, 2019, 2022]
+        image: [2019, 2022]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
