@@ -74,6 +74,7 @@ create_archives() {
   popd > /dev/null
 
   pushd ${_newmsysbase} > /dev/null
+    export XZ_OPT="-e9T0"
     local _compress_cmd2="/usr/bin/tar --transform='s/:/_/g' --dereference --hard-dereference -cJf ${_thisdir}/${_filename2} msys${_bitness}"
     echo "Run: ${_compress_cmd2} ..." | tee -a ${_log}
     eval "${_compress_cmd2}" 2>&1 | tee -a ${_log}
