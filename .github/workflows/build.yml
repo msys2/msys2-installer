@@ -56,7 +56,7 @@ jobs:
           path: msys2-*
 
   test-installer:
-    name: windows-${{ matrix.image }}
+    name: installer-${{ matrix.image }}
     runs-on: windows-${{ matrix.image }}
     needs: build-installer
     strategy:
@@ -92,7 +92,7 @@ jobs:
           C:\msys2-install-test\uninstall.exe pr --confirm-command
 
   test-docker-sfx:
-    name: ltsc-${{ matrix.image }}
+    name: docker-sfx-${{ matrix.image }}
     runs-on: windows-${{ matrix.image }}
     needs: build-installer
     strategy:
@@ -124,7 +124,7 @@ jobs:
           docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm git"
 
   test-sfx:
-    name: ${{ matrix.image }}
+    name: sfx-${{ matrix.image }}
     runs-on: windows-${{ matrix.image }}
     needs: build-installer
     strategy:
