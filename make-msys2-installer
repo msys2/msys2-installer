@@ -113,6 +113,7 @@ create_chroot_system() {
     mkdir -p tmp
 
     eval "pacman -Syu --root \"${_newmsys}\"" | tee -a ${_log}
+    eval "pacman -S filesystem msys2-runtime --noconfirm --root \"${_newmsys}\"" | tee -a ${_log}
     eval "pacman -S base --noconfirm --root \"${_newmsys}\"" | tee -a ${_log}
     _result=$?
     if [ "${_result}" -ne "0" ]; then
