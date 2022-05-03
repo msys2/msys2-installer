@@ -120,6 +120,7 @@ jobs:
         run: |
           docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman --version"
           docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman -Qkv"
+          docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman -Qkk || true"
           docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman -Syy"
           docker run msys2-base C:\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm git"
 
@@ -155,6 +156,7 @@ jobs:
         run: |
           C:\msys2-install-test\msys64\usr\bin\bash.exe -lc "pacman --version"
           C:\msys2-install-test\msys64\usr\bin\bash.exe -lc "pacman -Qkv"
+          C:\msys2-install-test\msys64\usr\bin\bash.exe -lc "pacman -Qkk || true"
           C:\msys2-install-test\msys64\usr\bin\bash.exe -lc "pacman -Syy"
           C:\msys2-install-test\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm git"
 
