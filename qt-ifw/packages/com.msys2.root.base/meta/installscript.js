@@ -23,11 +23,6 @@ function createShortcuts()
     component.addOperation("CreateShortcut", "@TargetDir@/clang64.exe", "@StartMenuDir@/MSYS2 CLANG64.lnk", "iconPath=@TargetDir@/clang64.exe");
     component.addOperation("CreateShortcut", "@TargetDir@/msys2.exe", "@StartMenuDir@/MSYS2 MSYS.lnk", "iconPath=@TargetDir@/msys2.exe");
 
-    if ("@BITNESS@bit" === "32bit") {
-        component.addOperation( "Execute",
-                               ["@TargetDir@\\autorebase.bat"]);
-    }
-
     component.addOperation( "Execute",
                            ["@TargetDir@\\usr\\bin\\bash.exe", "--login", "-c", "exit"]);
 }
