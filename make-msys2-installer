@@ -11,16 +11,11 @@ _filename=msys2-${_arch}-${_date}.exe
 _filename2=msys2-base-${_arch}-${_date}.tar.xz
 _filename3=msys2-base-${_arch}-${_date}.sfx.exe
 _log=/tmp/installer-${_arch}-${_date}.log
-if [ "${_arch}" = "x86_64" ]; then
-  _bitness=64
-else
-  _bitness=32
-fi
-_archivegen=/mingw${_bitness}/bin/archivegen.exe
-_binarycreator=/mingw${_bitness}/bin/binarycreator.exe
-_installerbase=/mingw${_bitness}/bin/installerbase.exe
+_archivegen=/mingw64/bin/archivegen.exe
+_binarycreator=/mingw64/bin/binarycreator.exe
+_installerbase=/mingw64/bin/installerbase.exe
 _newmsysbase=/tmp/newmsys
-_newmsys=${_newmsysbase}/msys"${_bitness}"
+_newmsys=${_newmsysbase}/msys64
 
 declare -a undo_commands
 
@@ -43,16 +38,12 @@ exit_cleanly() {
 do_seds() {
   find "${_ifwroot}" \( -name "package.xml" -or -name "config.xml" \) -exec sed -i "s|@DATE@|${_dateqif}|g" "{}" \;
   find "${_ifwroot}" \( -name "package.xml" -or -name "config.xml" \) -exec sed -i "s|@VERSION@|${_version}|g" "{}" \;
-  find "${_ifwroot}" \( -name "package.xml" -or -name "config.xml" -or -name "installscript.js" \) -exec sed -i "s|@BITNESS@|${_bitness}|g" "{}" \;
   undo_commands+=("undo_seds")
 }
 
 undo_seds() {
   find "${_ifwroot}" \( -name "package.xml" -or -name "config.xml" \) -exec sed -i "s|<ReleaseDate>${_dateqif}<|<ReleaseDate>@DATE@<|g" "{}" \;
   find "${_ifwroot}" \( -name "package.xml" -or -name "config.xml" \) -exec sed -i "s|<Version>${_version}<|<Version>@VERSION@<|g" "{}" \;
-  find "${_ifwroot}" \( -name "package.xml" -or -name "config.xml" -or -name "installscript.js" \) -exec sed -i "s|msys${_bitness}|msys@BITNESS@|g" "{}" \;
-  find "${_ifwroot}" \( -name "package.xml" -or -name "config.xml" -or -name "installscript.js" \) -exec sed -i "s|${_bitness}bit|@BITNESS@bit|g" "{}" \;
-  find "${_ifwroot}" \( -name "package.xml" -or -name "config.xml" -or -name "installscript.js" \) -exec sed -i "s|if (\"@BITNESS@bit\" === \"@BITNESS@bit\")|if (\"@BITNESS@bit\" === \"32bit\")|g" "{}" \;
 }
 
 create_archives() {
@@ -61,13 +52,13 @@ create_archives() {
   mkdir -p "${_data}"
 
   local _dirs="${_newmsys}/"*
-  local _compress_cmd="${_archivegen} --compression 9 ${_data}/msys${_bitness}.7z ${_dirs}"
+  local _compress_cmd="${_archivegen} --compression 9 ${_data}/msys64.7z ${_dirs}"
   pushd / > /dev/null
     echo "Run: ${_compress_cmd} ..." | tee -a ${_log}
     eval "${_compress_cmd}" 2>&1 | tee -a ${_log}
     _result=$?
     if [ "${_result}" -eq "0" ]; then
-          echo " archivegen succeeded. Created ${_data}/msys${_bitness}.7z" | tee -a ${_log}
+          echo " archivegen succeeded. Created ${_data}/msys64.7z" | tee -a ${_log}
     else
           exit_cleanly "3" "archivegen failed. See ${_log}"
     fi
@@ -75,7 +66,7 @@ create_archives() {
 
   pushd ${_newmsysbase} > /dev/null
     export XZ_OPT="-e9T0"
-    local _compress_cmd2="/usr/bin/tar --transform='s/:/_/g' --dereference --hard-dereference -cJf ${_thisdir}/${_filename2} msys${_bitness}"
+    local _compress_cmd2="/usr/bin/tar --transform='s/:/_/g' --dereference --hard-dereference -cJf ${_thisdir}/${_filename2} msys64"
     echo "Run: ${_compress_cmd2} ..." | tee -a ${_log}
     eval "${_compress_cmd2}" 2>&1 | tee -a ${_log}
     _result=$?
@@ -86,7 +77,7 @@ create_archives() {
     fi
 
     # self extracting cli 7z archive
-    "${_thisdir}/create-sfx.sh" "msys${_bitness}" "${_thisdir}/${_filename3}"
+    "${_thisdir}/create-sfx.sh" "msys64" "${_thisdir}/${_filename3}"
   popd > /dev/null
 }
 
@@ -123,7 +114,7 @@ create_chroot_system() {
 }
 
 if [ ! -f "${_archivegen}" ]; then
-  eval "pacman -S --noconfirm mingw${_bitness}/mingw-w64-${_arch}-qt-installer-framework" | tee -a ${_log}
+  eval "pacman -S --noconfirm mingw64/mingw-w64-${_arch}-qt-installer-framework" | tee -a ${_log}
 fi
 
 if [ ! -f "${_archivegen}" ]; then
