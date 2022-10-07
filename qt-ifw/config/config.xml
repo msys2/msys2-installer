@@ -6,7 +6,7 @@
     <Publisher>The MSYS2 Developers</Publisher>
     <ControlScript>control.js</ControlScript>
     <StartMenuDir>MSYS2</StartMenuDir>
-    <RunProgram>@TargetDir@/mingw64.exe</RunProgram>
+    <RunProgram>@TargetDir@/ucrt64.exe</RunProgram>
     <RunProgramArguments></RunProgramArguments>
     <InstallerApplicationIcon>../../msys2</InstallerApplicationIcon>
     <InstallerWindowIcon>../../msys2</InstallerWindowIcon>
