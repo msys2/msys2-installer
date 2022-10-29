@@ -18,7 +18,8 @@ function isSupported()
     if (systemInfo.kernelType === "winnt") {
         var major = parseInt(systemInfo.kernelVersion.split(".", 1));
         var minor = parseInt(systemInfo.kernelVersion.split(".", 2)[1]);
-        if (major > 6 || (major == 6 && minor >= 1)) {
+        // Windows >= 8.1
+        if (major > 6 || (major == 6 && minor >= 3)) {
             return true;
         }
     }
