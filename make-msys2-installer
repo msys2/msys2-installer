@@ -46,7 +46,7 @@ undo_seds() {
   find "${_ifwroot}" \( -name "package.xml" -or -name "config.xml" \) -exec sed -i "s|<Version>${_version}<|<Version>@VERSION@<|g" "{}" \;
 }
 
-create_archives() {
+create_installer_archive() {
   local _data="${_ifwroot}"/packages/com.msys2.root.base/data
   [ -d "${_data}" ] && rm -rf "${_data}"
   mkdir -p "${_data}"
@@ -63,7 +63,9 @@ create_archives() {
           exit_cleanly "3" "archivegen failed. See ${_log}"
     fi
   popd > /dev/null
+}
 
+create_sfx() {
   pushd ${_newmsysbase} > /dev/null
     export XZ_OPT="-e9T0"
     local _compress_cmd2="/usr/bin/tar --transform='s/:/_/g' --dereference --hard-dereference -cJf ${_thisdir}/${_filename2} msys64"
@@ -134,6 +136,7 @@ if [ -f /tmp/${_filename} ]; then
 fi
 
 do_seds
-create_archives
+create_installer_archive
+create_sfx
 make_installer
 exit_cleanly "0" "All done, see ${_filename}"
