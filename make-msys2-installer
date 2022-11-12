@@ -9,7 +9,6 @@ _version=${_date}
 _filename=msys2-x86_64-${_date}.exe
 _filename2=msys2-base-x86_64-${_date}.tar.xz
 _filename3=msys2-base-x86_64-${_date}.sfx.exe
-_archivegen=/mingw64/bin/archivegen.exe
 _binarycreator=/mingw64/bin/binarycreator.exe
 _installerbase=/mingw64/bin/installerbase.exe
 _newmsysbase=/tmp/newmsys
@@ -50,7 +49,7 @@ create_installer_archive() {
   mkdir -p "${_data}"
 
   local _dirs="${_newmsys}/"*
-  local _compress_cmd="${_archivegen} --compression 9 ${_data}/msys64.7z ${_dirs}"
+  local _compress_cmd="7z a -mx9 -md128m ${_data}/msys64.7z ${_dirs}"
   pushd / > /dev/null
     echo "Run: ${_compress_cmd} ..."
     eval "${_compress_cmd}" 2>&1
@@ -113,13 +112,9 @@ create_chroot_system() {
   popd > /dev/null
 }
 
-if [ ! -f "${_archivegen}" ]; then
-  pacman -S --noconfirm mingw64/mingw-w64-x86_64-qt-installer-framework
-fi
-
-if [ ! -f "${_archivegen}" ]; then
-  exit_cleanly "2" "installation of qt installer framework failed."
-fi
+pacman -S --noconfirm --needed \
+  mingw-w64-x86_64-qt-installer-framework \
+  mingw-w64-x86_64-7zip
 
 echo "Creating MSYS2 chroot system ${_newmsys}"
 create_chroot_system
