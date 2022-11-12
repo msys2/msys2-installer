@@ -41,7 +41,6 @@ function Component() {
     var targetDir = installer.value("TargetDir", systemDrive+"\\msys64")
 
     installer.setValue("TargetDir", targetDir);
-    installer.setDefaultPageVisible(QInstaller.Introduction, false);
     installer.setDefaultPageVisible(QInstaller.TargetDirectory, true);
     installer.setDefaultPageVisible(QInstaller.ComponentSelection, false);
     installer.setDefaultPageVisible(QInstaller.ReadyForInstallation, false);
