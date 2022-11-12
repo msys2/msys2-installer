@@ -19,9 +19,12 @@ jobs:
       - name: setup-msys2
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MSYS
+          msystem: MINGW64
           update: true
-          install: p7zip tar mingw-w64-x86_64-qt-installer-framework
+          install: >-
+            tar
+            mingw-w64-x86_64-qt-installer-framework
+            mingw-w64-x86_64-7zip
 
       - name: Switch to the main mirror
         shell: msys2 {0}
