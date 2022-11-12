@@ -114,20 +114,20 @@ create_chroot_system() {
   popd > /dev/null
 }
 
-pacman -S --noconfirm --needed \
-  mingw-w64-x86_64-qt-installer-framework \
-  mingw-w64-x86_64-7zip
+main() {
+  pacman -S --noconfirm --needed \
+    mingw-w64-x86_64-qt-installer-framework \
+    mingw-w64-x86_64-7zip
 
-echo "Creating MSYS2 chroot system ${_newmsys}"
-create_chroot_system
+  echo "Creating MSYS2 chroot system ${_newmsys}"
+  create_chroot_system
 
-echo "Creating MSYS2 installer /tmp/${_filename}"
-if [ -f /tmp/${_filename} ]; then
-  rm -f /tmp/${_filename}
-fi
+  do_seds
+  create_installer_archive
+  create_archive
+  create_sfx
+  make_installer
+  exit_cleanly "0" "All done, see ${_filename}"
+}
 
-do_seds
-create_installer_archive
-create_sfx
-make_installer
-exit_cleanly "0" "All done, see ${_filename}"
+main
