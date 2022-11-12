@@ -10,7 +10,6 @@ _version=${_date}
 _filename=msys2-${_arch}-${_date}.exe
 _filename2=msys2-base-${_arch}-${_date}.tar.xz
 _filename3=msys2-base-${_arch}-${_date}.sfx.exe
-_log=/tmp/installer-${_arch}-${_date}.log
 _archivegen=/mingw64/bin/archivegen.exe
 _binarycreator=/mingw64/bin/binarycreator.exe
 _installerbase=/mingw64/bin/installerbase.exe
@@ -23,7 +22,7 @@ _exitcode=5
 
 exit_with_undo() {
   for _cmd in ${undo_commands[@]}; do
-    eval "${_cmd}" | tee -a ${_log}
+    eval "${_cmd}"
   done
   exit ${_exitcode}
 }
@@ -31,7 +30,7 @@ exit_with_undo() {
 exit_cleanly() {
   _exitcode=$1; shift;
   local _message=$1; shift;
-  echo "${_message}" | tee -a ${_log}
+  echo "${_message}"
   exit_with_undo
 }
 
@@ -54,13 +53,13 @@ create_installer_archive() {
   local _dirs="${_newmsys}/"*
   local _compress_cmd="${_archivegen} --compression 9 ${_data}/msys64.7z ${_dirs}"
   pushd / > /dev/null
-    echo "Run: ${_compress_cmd} ..." | tee -a ${_log}
-    eval "${_compress_cmd}" 2>&1 | tee -a ${_log}
+    echo "Run: ${_compress_cmd} ..."
+    eval "${_compress_cmd}" 2>&1
     _result=$?
     if [ "${_result}" -eq "0" ]; then
-          echo " archivegen succeeded. Created ${_data}/msys64.7z" | tee -a ${_log}
+          echo " archivegen succeeded. Created ${_data}/msys64.7z"
     else
-          exit_cleanly "3" "archivegen failed. See ${_log}"
+          exit_cleanly "3" "archivegen failed."
     fi
   popd > /dev/null
 }
@@ -69,13 +68,13 @@ create_sfx() {
   pushd ${_newmsysbase} > /dev/null
     export XZ_OPT="-e9T0"
     local _compress_cmd2="/usr/bin/tar --transform='s/:/_/g' --dereference --hard-dereference -cJf ${_thisdir}/${_filename2} msys64"
-    echo "Run: ${_compress_cmd2} ..." | tee -a ${_log}
-    eval "${_compress_cmd2}" 2>&1 | tee -a ${_log}
+    echo "Run: ${_compress_cmd2} ..."
+    eval "${_compress_cmd2}"
     _result=$?
     if [ "${_result}" -eq "0" ]; then
-          echo " tar succeeded. Created " | tee -a ${_log}
+          echo " tar succeeded. Created "
     else
-          die "MSYS2 compressing fail. See ${_log}"
+          die "MSYS2 compressing fail."
     fi
 
     # self extracting cli 7z archive
@@ -85,13 +84,13 @@ create_sfx() {
 
 # Add -v to get more information.
 make_installer() {
-  eval "\"${_binarycreator}\" \
-    -t \"${_installerbase}\" \
-    -p \"${_ifwroot}/packages\" \
-    -c \"${_ifwroot}/config/config.xml\" \
+  "${_binarycreator}" \
+    -t "${_installerbase}" \
+    -p "${_ifwroot}/packages" \
+    -c "${_ifwroot}/config/config.xml" \
     --offline-only \
-    \"${_filename}\" \
-    -v"  | tee -a ${_log}
+    "${_filename}" \
+    -v
 }
 
 trap exit_with_undo 1 2 15
@@ -105,9 +104,9 @@ create_chroot_system() {
     mkdir -p var/log
     mkdir -p tmp
 
-    eval "pacman -Syu --root \"${_newmsys}\"" | tee -a ${_log}
-    eval "pacman -S filesystem msys2-runtime --noconfirm --root \"${_newmsys}\"" | tee -a ${_log}
-    eval "pacman -S base --noconfirm --root \"${_newmsys}\"" | tee -a ${_log}
+    pacman -Syu --root "${_newmsys}"
+    pacman -S filesystem msys2-runtime --noconfirm --root "${_newmsys}"
+    pacman -S base --noconfirm --root "${_newmsys}"
     _result=$?
     if [ "${_result}" -ne "0" ]; then
       exit_cleanly "1" "failed to create newmsys2 via command 'pacman -S base --noconfirm --root ${_newmsys}'"
@@ -116,21 +115,17 @@ create_chroot_system() {
 }
 
 if [ ! -f "${_archivegen}" ]; then
-  eval "pacman -S --noconfirm mingw64/mingw-w64-${_arch}-qt-installer-framework" | tee -a ${_log}
+  pacman -S --noconfirm mingw64/mingw-w64-${_arch}-qt-installer-framework
 fi
 
 if [ ! -f "${_archivegen}" ]; then
-  exit_cleanly "2" "installation of qt installer framework failed. See ${_log}"
+  exit_cleanly "2" "installation of qt installer framework failed."
 fi
 
-if [ -f "${_log}" ]; then
-  rm "${_log}"
-fi
-
-echo "Creating MSYS2 chroot system ${_newmsys}" | tee -a ${_log}
+echo "Creating MSYS2 chroot system ${_newmsys}"
 create_chroot_system
 
-echo "Creating MSYS2 installer /tmp/${_filename}" | tee -a ${_log}
+echo "Creating MSYS2 installer /tmp/${_filename}"
 if [ -f /tmp/${_filename} ]; then
   rm -f /tmp/${_filename}
 fi
