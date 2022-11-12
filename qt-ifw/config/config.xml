@@ -8,8 +8,8 @@
     <StartMenuDir>MSYS2</StartMenuDir>
     <RunProgram>@TargetDir@/ucrt64.exe</RunProgram>
     <RunProgramArguments></RunProgramArguments>
-    <InstallerApplicationIcon>../../msys2</InstallerApplicationIcon>
-    <InstallerWindowIcon>../../msys2</InstallerWindowIcon>
+    <InstallerApplicationIcon>msys2</InstallerApplicationIcon>
+    <InstallerWindowIcon>msys2.ico</InstallerWindowIcon>
     <InstallActionColumnVisible>false</InstallActionColumnVisible>
     <MaintenanceToolName>uninstall</MaintenanceToolName>
     <SupportsModify>false</SupportsModify>
