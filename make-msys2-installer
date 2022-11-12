@@ -62,7 +62,7 @@ create_installer_archive() {
   popd > /dev/null
 }
 
-create_sfx() {
+create_archive() {
   pushd ${_newmsysbase} > /dev/null
     export XZ_OPT="-e9T0"
     local _compress_cmd2="/usr/bin/tar --transform='s/:/_/g' --dereference --hard-dereference -cJf ${_thisdir}/${_filename2} msys64"
@@ -74,10 +74,12 @@ create_sfx() {
     else
           die "MSYS2 compressing fail."
     fi
-
-    # self extracting cli 7z archive
-    "${_thisdir}/create-sfx.sh" "msys64" "${_thisdir}/${_filename3}"
   popd > /dev/null
+}
+
+create_sfx() {
+  # self extracting cli 7z archive
+  "${_thisdir}/create-sfx.sh" "msys64" "${_thisdir}/${_filename3}"
 }
 
 # Add -v to get more information.
