@@ -4,5 +4,6 @@
   <Description>Cygwin-derived Posix-like env. for Windows with Arch Linux's Pacman</Description>
   <Version>@VERSION@</Version>
   <ReleaseDate>@DATE@</ReleaseDate>
+  <Default>true</Default>
   <Script>installscript.js</Script>
 </Package>

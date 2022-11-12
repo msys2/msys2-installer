@@ -44,7 +44,7 @@ undo_seds() {
 }
 
 create_installer_archive() {
-  local _data="${_ifwroot}"/packages/com.msys2.root.base/data
+  local _data="${_ifwroot}"/packages/com.msys2.root/data
   [ -d "${_data}" ] && rm -rf "${_data}"
   mkdir -p "${_data}"
 
