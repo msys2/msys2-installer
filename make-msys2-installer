@@ -3,13 +3,12 @@
 _thisdir="$(dirname $0)"
 test "${_thisdir}" = "." && _thisdir=${PWD}
 _ifwroot="${_thisdir}"/qt-ifw
-_arch=$(uname -m)
 _date=$(date +'%Y%m%d')
 _dateqif=$(date +'%Y-%m-%d')
 _version=${_date}
-_filename=msys2-${_arch}-${_date}.exe
-_filename2=msys2-base-${_arch}-${_date}.tar.xz
-_filename3=msys2-base-${_arch}-${_date}.sfx.exe
+_filename=msys2-x86_64-${_date}.exe
+_filename2=msys2-base-x86_64-${_date}.tar.xz
+_filename3=msys2-base-x86_64-${_date}.sfx.exe
 _archivegen=/mingw64/bin/archivegen.exe
 _binarycreator=/mingw64/bin/binarycreator.exe
 _installerbase=/mingw64/bin/installerbase.exe
@@ -115,7 +114,7 @@ create_chroot_system() {
 }
 
 if [ ! -f "${_archivegen}" ]; then
-  pacman -S --noconfirm mingw64/mingw-w64-${_arch}-qt-installer-framework
+  pacman -S --noconfirm mingw64/mingw-w64-x86_64-qt-installer-framework
 fi
 
 if [ ! -f "${_archivegen}" ]; then
