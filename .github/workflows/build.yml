@@ -14,7 +14,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: setup-msys2
         uses: msys2/setup-msys2@v2
@@ -53,7 +53,7 @@ jobs:
           sha256sum.exe msys2-* > msys2-checksums.txt
 
       - name: Upload Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: installer
           path: msys2-*
@@ -68,9 +68,9 @@ jobs:
         image: [2019, 2022]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: installer
 
@@ -104,9 +104,9 @@ jobs:
         image: [2019, 2022]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: installer
 
@@ -137,9 +137,9 @@ jobs:
         image: [2019, 2022]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: installer
 
@@ -173,7 +173,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: installer
 
