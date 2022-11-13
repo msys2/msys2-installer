@@ -26,19 +26,14 @@ Installing the self extracting archive to `C:\msys64`:
 .\msys2-base-x86_64-latest.sfx.exe -y -oC:\
 ```
 
-## Build Instructions
+## FAQ
 
-```bash
-# Run in a MSYS2 environment
-./make-msys2-installer
-```
+### What's the difference between the installer and the archives?
 
-## New Release TODO List
+The installer provides some additional features such as installing shortcuts, registering an uninstaller, a GUI for selecting the installation path and automatically running a login shell at the end to initialize the MSYS2 environment.
 
-* Trigger a new nightly build via https://github.com/msys2/msys2-installer/actions/workflows/build.yml or use an existing one
-* Get all files with dates in their names, sign them and create checksum files (.sig and .sha256)
-* Create a new git tag following format: `date -I`
-* Upload the installer files to the release tag
-* Update the download link and checksum for the GiHub action and verify that all tests pass: https://github.com/msys2/setup-msys2/blob/master/main.js
-* Run `msys2-devtools/update-installer "$(date -I)"` on the server to copy the release from GitHub
-* Update the link, name and checksum on the main website (pointing to GitHub): https://github.com/msys2/msys2.github.io/blob/source/web/index.md
+If you unpack the archives and run a login shell once, you will get a functionally equivalent MSYS2 installation.
+
+### What is contained in the installer/archives?
+
+It contains the [base](https://packages.msys2.org/package/base) package and all its dependencies. You can list the contained packages using: `pactree base -lu | sort`
