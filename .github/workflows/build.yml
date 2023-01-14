@@ -4,6 +4,12 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      with_staging:
+        description: 'Include the staging repo when building the installer'
+        default: false
+        required: false
+        type: boolean
   schedule:
     - cron: '0 3 * * *'
 
@@ -32,6 +38,12 @@ jobs:
           echo 'Server = https://repo.msys2.org/mingw/$repo/' > /etc/pacman.d/mirrorlist.mingw
           echo 'Server = https://repo.msys2.org/msys/$arch/' > /etc/pacman.d/mirrorlist.msys
           pacman-conf.exe
+
+      - name: Add staging repo
+        if: ${{ github.event.inputs.with_staging }}
+        shell: msys2 {0}
+        run: |
+          sed -i '1s|^|[staging]\nServer = https://repo.msys2.org/staging/\nSigLevel = Never\n|' /etc/pacman.conf
 
       - name: Update using the main mirror & Check install
         run: |
@@ -170,7 +182,7 @@ jobs:
       - test-docker-sfx
       - test-installer
       - test-sfx
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && !${{ github.event.inputs.with_staging }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v3
