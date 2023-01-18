@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       with_staging:
-        description: 'Include the staging repo when building the installer (and skip the final upload)'
+        description: 'Include the staging repo when building the installer'
         default: false
         required: false
         type: boolean
