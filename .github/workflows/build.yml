@@ -49,6 +49,7 @@ jobs:
           mv msys2-base-x86_64-[0-9]*.sfx.exe msys2-base-x86_64-latest.sfx.exe
           mv msys2-x86_64-[0-9]*.exe msys2-x86_64-latest.exe
           mv msys2-*.tar.xz msys2-base-x86_64-latest.tar.xz
+          mv msys2-*.packages.txt msys2-base-x86_64-latest.packages.txt
           sha256sum.exe msys2-*
           sha256sum.exe msys2-* > msys2-checksums.txt
 

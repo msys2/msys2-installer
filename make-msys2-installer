@@ -72,6 +72,7 @@ create_chroot_system() {
     pacman -Syu --root "${_newmsys}"
     pacman -S filesystem msys2-runtime --noconfirm --root "${_newmsys}"
     pacman -S base --noconfirm --root "${_newmsys}"
+    pacman -Q --root "${_newmsys}" > "${_thisdir}/msys2-base-x86_64-${_date}.packages.txt"
   popd > /dev/null
 }
 
