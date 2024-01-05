@@ -54,7 +54,7 @@ jobs:
           sha256sum.exe msys2-* > msys2-checksums.txt
 
       - name: Upload Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: installer
           path: msys2-*
@@ -71,7 +71,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: installer
 
@@ -107,7 +107,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: installer
 
@@ -140,7 +140,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: installer
 
@@ -174,7 +174,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: installer
 
