@@ -1,4 +1,5 @@
 _cache
 *.exe
 *.xz
+*.zst
 _build

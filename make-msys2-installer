@@ -21,13 +21,21 @@ create_installer_archive() {
   popd > /dev/null
 }
 
-create_archive() {
-  echo "[Creating archive...]"
-
+create_archives() {
+  echo "[Creating tarball...]"
   pushd "${_newmsysbase}" > /dev/null
-    export XZ_OPT="-9T0"
-    /usr/bin/tar --transform='s/:/_/g' --dereference --hard-dereference -cJf "${_thisdir}/msys2-base-x86_64-${_date}.tar.xz" msys64
+  /usr/bin/tar --transform='s/:/_/g' --dereference --hard-dereference -cf "${_thisdir}/msys2-base-x86_64-${_date}.tar" msys64
   popd > /dev/null
+
+  echo "[Creating xz archive...]"
+  xz -9 --keep --verbose --force --compress --threads=0 "${_thisdir}/msys2-base-x86_64-${_date}.tar"
+  xz --test "${_thisdir}/msys2-base-x86_64-${_date}.tar.xz"
+
+  echo "[Creating zstd archive...]"
+  zstd -T0 -22 --ultra --force "${_thisdir}/msys2-base-x86_64-${_date}.tar" -o "${_thisdir}/msys2-base-x86_64-${_date}.tar.zst"
+  zstd --test "${_thisdir}/msys2-base-x86_64-${_date}.tar.zst"
+
+  rm "${_thisdir}/msys2-base-x86_64-${_date}.tar"
 }
 
 create_sfx() {
@@ -80,6 +88,8 @@ main() {
   pacman -S --noconfirm --needed \
     "${MINGW_PACKAGE_PREFIX}-qt-installer-framework" \
     "${MINGW_PACKAGE_PREFIX}-7zip" \
+    "${MINGW_PACKAGE_PREFIX}-xz" \
+    "${MINGW_PACKAGE_PREFIX}-zstd" \
     "tar"
 
   create_chroot_system
@@ -88,7 +98,7 @@ main() {
   create_installer_archive
   create_installer
 
-  create_archive
+  create_archives
   create_sfx
 }
 
