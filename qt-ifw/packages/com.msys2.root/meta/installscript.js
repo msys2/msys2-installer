@@ -34,7 +34,6 @@ function createShortcuts()
         return;
     }
 
-    component.addOperation("CreateShortcut", "@TargetDir@/mingw32.exe", "@StartMenuDir@/MSYS2 MINGW32.lnk", "iconPath=@TargetDir@/mingw32.exe");
     component.addOperation("CreateShortcut", "@TargetDir@/mingw64.exe", "@StartMenuDir@/MSYS2 MINGW64.lnk", "iconPath=@TargetDir@/mingw64.exe");
     component.addOperation("CreateShortcut", "@TargetDir@/ucrt64.exe", "@StartMenuDir@/MSYS2 UCRT64.lnk", "iconPath=@TargetDir@/ucrt64.exe");
     component.addOperation("CreateShortcut", "@TargetDir@/clang64.exe", "@StartMenuDir@/MSYS2 CLANG64.lnk", "iconPath=@TargetDir@/clang64.exe");
