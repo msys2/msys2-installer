@@ -11,6 +11,8 @@
     <InstallerApplicationIcon>msys2</InstallerApplicationIcon>
     <InstallerWindowIcon>msys2.ico</InstallerWindowIcon>
     <InstallActionColumnVisible>false</InstallActionColumnVisible>
+    <WizardStyle>Modern</WizardStyle>
+    <WizardDefaultWidth>40em</WizardDefaultWidth>
     <MaintenanceToolName>uninstall</MaintenanceToolName>
     <SupportsModify>false</SupportsModify>
     <RepositorySettingsPageVisible>false</RepositorySettingsPageVisible>
