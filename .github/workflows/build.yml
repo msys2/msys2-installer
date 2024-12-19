@@ -11,7 +11,7 @@ concurrency: nope
 
 jobs:
   build-installer:
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,7 +70,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2019, 2022]
+        image: [2019, 2022, 2025]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -108,7 +108,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2019, 2022]
+        image: [2019, 2022, 2025]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -143,7 +143,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2019, 2022]
+        image: [2019, 2022, 2025]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
