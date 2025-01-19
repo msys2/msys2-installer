@@ -8,6 +8,8 @@ on:
     - cron: '0 3 * * *'
 
 concurrency: nope
+permissions:
+  contents: read
 
 jobs:
   zizmor:
