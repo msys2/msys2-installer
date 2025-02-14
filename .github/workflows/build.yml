@@ -128,7 +128,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2019, 2022, 2025]
+        # FIXME: https://github.com/actions/runner-images/issues/11582
+        image: [2019, 2022]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
