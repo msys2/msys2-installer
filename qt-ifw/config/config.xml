@@ -17,4 +17,5 @@
     <SupportsModify>false</SupportsModify>
     <RepositorySettingsPageVisible>false</RepositorySettingsPageVisible>
     <SaveDefaultRepositories>false</SaveDefaultRepositories>
+    <AllowRepositoriesForOfflineInstaller>false</AllowRepositoriesForOfflineInstaller>
 </Installer>
