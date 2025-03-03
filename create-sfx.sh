@@ -4,13 +4,13 @@
 set -e
 
 # Download and extract https://github.com/mcmilk/7-Zip-zstd
-NAME="7z22.01-zstd-x64"
-CHECKSUM="d542d78397bbed8e77c221f36cad461a0d83f1263b993a7048e81df40f403fb8"
+NAME="7z24.09-zstd-x64"
+CHECKSUM="2378901c99005aed525971e6d308a3a80807efc6bb21075df53bbb7cd697572b"
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 mkdir -p "$DIR/_cache"
 BASE="$DIR/_cache/$NAME"
 if [ ! -f "$BASE.exe" ]; then
-    curl --fail -L "https://github.com/mcmilk/7-Zip-zstd/releases/download/v22.01-v1.5.5-R3/$NAME.exe" -o "$BASE.exe"
+    curl --fail -L "https://github.com/mcmilk/7-Zip-zstd/releases/download/v24.09-v1.5.7-R1/$NAME.exe" -o "$BASE.exe"
 fi
 echo "$CHECKSUM $BASE.exe" | sha256sum --quiet --check
 if [ ! -d "$BASE" ]; then
