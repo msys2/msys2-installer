@@ -163,7 +163,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2019, 2022, 2025]
+        image: [2019, 2022, 2025, 11-arm]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
