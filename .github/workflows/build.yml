@@ -39,7 +39,7 @@ jobs:
           persist-credentials: false
 
       - name: setup-msys2
-        uses: msys2/setup-msys2@v2
+        uses: msys2/setup-msys2@v2  # zizmor: ignore[unpinned-uses]
         with:
           msystem: CLANG64
           update: true
