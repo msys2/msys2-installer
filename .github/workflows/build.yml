@@ -90,7 +90,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2019, 2022, 2025]
+        image: [2022, 2025]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -128,7 +128,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2019, 2022, 2025]
+        image: [2022, 2025]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -163,7 +163,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2019, 2022, 2025, 11-arm]
+        image: [2022, 2025, 11-arm]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
