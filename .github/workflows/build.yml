@@ -31,7 +31,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-installer:
-    runs-on: windows-2025
+    runs-on: windows-${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - msystem: CLANGARM64
+            arch_name: arm64
+            image: 11-arm
+          - msystem: CLANG64
+            arch_name: x86_64
+            image: 2022
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,7 +51,7 @@ jobs:
       - name: setup-msys2
         uses: msys2/setup-msys2@v2  # zizmor: ignore[unpinned-uses]
         with:
-          msystem: CLANG64
+          msystem: ${{ matrix.msystem }}
           update: true
           install: >-
             tar
@@ -69,18 +79,20 @@ jobs:
 
       - name: Create 'latest' Variants and Checksums
         run: |
-          mv msys2-base-x86_64-[0-9]*.sfx.exe msys2-base-x86_64-latest.sfx.exe
-          mv msys2-x86_64-[0-9]*.exe msys2-x86_64-latest.exe
-          mv msys2-*.tar.xz msys2-base-x86_64-latest.tar.xz
-          mv msys2-*.tar.zst msys2-base-x86_64-latest.tar.zst
-          mv msys2-*.packages.txt msys2-base-x86_64-latest.packages.txt
+          mv msys2-base-${{ matrix.arch_name }}-[0-9]*.sfx.exe msys2-base-${{ matrix.arch_name }}-latest.sfx.exe
+          mv msys2-${{ matrix.arch_name }}-[0-9]*.exe msys2-${{ matrix.arch_name }}-latest.exe
+          if ("${{ matrix.arch_name }}" -ne "arm64") {
+            mv msys2-*.tar.xz msys2-base-${{ matrix.arch_name }}-latest.tar.xz
+            mv msys2-*.tar.zst msys2-base-${{ matrix.arch_name }}-latest.tar.zst
+          }
+          mv msys2-*.packages.txt msys2-base-${{ matrix.arch_name }}-latest.packages.txt
           sha256sum.exe msys2-*
-          sha256sum.exe msys2-* > msys2-checksums.txt
+          sha256sum.exe msys2-* > msys2-${{ matrix.arch_name }}-checksums.txt
 
       - name: Upload Results
         uses: actions/upload-artifact@v4
         with:
-          name: installer
+          name: installer-${{ matrix.arch_name }}
           path: msys2-*
 
   test-installer:
@@ -90,7 +102,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2022, 2025]
+        include:
+          - arch_name: arm64
+            image: 11-arm
+          - arch_name: x86_64
+            image: 2022
+          - arch_name: x86_64
+            image: 2025
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -99,11 +117,11 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: installer
+          name: installer-${{ matrix.arch_name }}
 
       - name: Install
         run: |
-          ./msys2-x86_64-latest.exe in --confirm-command --accept-messages --root C:/msys2-install-test
+          ./msys2-${{ matrix.arch_name }}-latest.exe in --confirm-command --accept-messages --root C:/msys2-install-test
 
       - name: Test without Login Shell
         run: |
@@ -137,7 +155,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: installer
+          name: installer-x86_64
 
       - name: Build image
         run: |
@@ -163,7 +181,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [2022, 2025, 11-arm]
+        include:
+          - arch_name: arm64
+            image: 11-arm
+          - arch_name: x86_64
+            image: 2022
+          - arch_name: x86_64
+            image: 2025
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -172,11 +196,11 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: installer
+          name: installer-${{ matrix.arch_name }}
 
       - name: Install
         run: |
-          ./msys2-base-x86_64-latest.sfx.exe  -y -oC:/msys2-install-test
+          ./msys2-base-${{ matrix.arch_name }}-latest.sfx.exe  -y -oC:/msys2-install-test
 
       - name: Test without Login Shell
         run: |
@@ -207,7 +231,11 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: installer
+          name: installer-x86_64
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: installer-arm64
 
       - name: Upload Installers
         env:
