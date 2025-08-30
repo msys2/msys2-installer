@@ -106,8 +106,8 @@ main() {
 
   if [ "$_arch_name" != "arm64" ]; then
     create_archives
+    create_sfx
   fi
-  create_sfx
 }
 
 main
