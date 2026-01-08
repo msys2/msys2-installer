@@ -106,6 +106,8 @@ jobs:
           - arch_name: arm64
             image: 11-arm
           - arch_name: x86_64
+            image: 11-arm
+          - arch_name: x86_64
             image: 2022
           - arch_name: x86_64
             image: 2025
