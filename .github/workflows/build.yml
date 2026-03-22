@@ -49,6 +49,8 @@ jobs:
           persist-credentials: false
 
       - name: setup-msys2
+        env:
+          __SETUP_MSYS2_USE_MAIN_MIRROR_ONLY: 'true'
         uses: msys2/setup-msys2@v2  # zizmor: ignore[unpinned-uses]
         with:
           msystem: ${{ matrix.msystem }}
@@ -58,19 +60,6 @@ jobs:
           pacboy: >-
             qt-installer-framework:p
             7zip:p
-
-      - name: Switch to the main mirror
-        shell: msys2 {0}
-        run: |
-          echo 'Server = https://repo.msys2.org/mingw/$repo/' > /etc/pacman.d/mirrorlist.mingw
-          echo 'Server = https://repo.msys2.org/msys/$arch/' > /etc/pacman.d/mirrorlist.msys
-          pacman-conf.exe
-
-      - name: Update using the main mirror & Check install
-        run: |
-          msys2 -c 'pacman --noconfirm -Suuy'
-          msys2 -c 'pacman --noconfirm -Suu'
-          msys2 -c 'pacman -Qkq'
 
       - name: Build Installer
         shell: msys2 {0}
