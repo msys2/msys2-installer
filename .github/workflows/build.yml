@@ -86,8 +86,9 @@ jobs:
             mv msys2-*.tar.zst msys2-base-${{ matrix.arch_name }}-latest.tar.zst
           }
           mv msys2-*.packages.txt msys2-base-${{ matrix.arch_name }}-latest.packages.txt
-          sha256sum.exe msys2-*
-          sha256sum.exe msys2-* > msys2-${{ matrix.arch_name }}-checksums.txt
+          sha256sum.exe msys2-* > checksums.tmp
+          cat checksums.tmp
+          mv checksums.tmp msys2-${{ matrix.arch_name }}-checksums.txt
 
       - name: Upload Results
         uses: actions/upload-artifact@v6
