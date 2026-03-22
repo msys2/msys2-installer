@@ -3,3 +3,4 @@ _cache
 *.xz
 *.zst
 _build
+_release
