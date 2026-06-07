@@ -8,8 +8,7 @@ on:
     - cron: '0 3 * * *'
 
 concurrency: nope
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   zizmor:
@@ -32,6 +31,8 @@ jobs:
 
   build-installer:
     runs-on: windows-${{ matrix.image }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -68,9 +69,9 @@ jobs:
 
       - name: Create 'latest' Variants and Checksums
         run: |
-          mv msys2-${{ matrix.arch_name }}-[0-9]*.exe msys2-${{ matrix.arch_name }}-latest.exe
+          mv msys2-${{ matrix.arch_name }}-[0-9]*.exe msys2-${{ matrix.arch_name }}-latest.exe.unsigned
           if ("${{ matrix.arch_name }}" -ne "arm64") {
-            mv msys2-base-${{ matrix.arch_name }}-[0-9]*.sfx.exe msys2-base-${{ matrix.arch_name }}-latest.sfx.exe
+            mv msys2-base-${{ matrix.arch_name }}-[0-9]*.sfx.exe msys2-base-${{ matrix.arch_name }}-latest.sfx.exe.unsigned
             mv msys2-*.tar.xz msys2-base-${{ matrix.arch_name }}-latest.tar.xz
             mv msys2-*.tar.zst msys2-base-${{ matrix.arch_name }}-latest.tar.zst
           }
@@ -85,10 +86,106 @@ jobs:
           name: installer-${{ matrix.arch_name }}
           path: msys2-*
 
+  sign-installer:
+    runs-on: ubuntu-24.04
+    needs:
+      - build-installer
+      - zizmor
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      id-token: write
+    environment:
+      name: sign-env
+      deployment: false
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: installer-x86_64
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: installer-arm64
+
+      - name: Download aas-sign
+        env:
+          AAS_SIGN_VERSION: 1.1.0
+          AAS_SIGN_CHECKSUM: 7c7d2b155a910b8144ea45ea1f7bda12afe6d749c9477b6d3c20321308e0e9f8
+        run: |
+          # FIXME: build this ourselves to avoid depending on a third party binary
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --output aas-sign \
+            "https://github.com/skeeto/aas-sign/releases/download/v${AAS_SIGN_VERSION}/aas-sign-linux-x86_64"
+          echo "${AAS_SIGN_CHECKSUM}  aas-sign" | sha256sum --check
+          chmod +x aas-sign
+
+      - name: Sign Installers
+        env:
+          # Not really secret, but can't hurt to not expose it publicly
+          AZURE_SIGNING_ENDPOINT: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          AZURE_SIGNING_PROFILE: ${{ secrets.AZURE_SIGNING_PROFILE }}
+          AZURE_SIGNING_CLIENT_ID: ${{ secrets.AZURE_SIGNING_CLIENT_ID }}
+          AZURE_SIGNING_TENANT_ID: ${{ secrets.AZURE_SIGNING_TENANT_ID }}
+        run: |
+          for f in *.exe.unsigned; do mv "$f" "${f%.exe.unsigned}.exe"; done
+          ./aas-sign sign \
+            --endpoint "${AZURE_SIGNING_ENDPOINT}" \
+            --account "${AZURE_SIGNING_ACCOUNT}" \
+            --profile "${AZURE_SIGNING_PROFILE}" \
+            --oidc-client-id "${AZURE_SIGNING_CLIENT_ID}" \
+            --oidc-tenant-id "${AZURE_SIGNING_TENANT_ID}" \
+            *.exe
+          sha256sum *.exe > checksums.tmp
+          cat checksums.tmp
+          mv checksums.tmp msys2-signed-checksums.txt
+
+      - name: Upload Results
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: installer-signed
+          path: '*.exe'
+
+  after-sign:
+    runs-on: ubuntu-24.04
+    needs:
+      - build-installer
+      - sign-installer
+    # This only exists for PRs, since we can't depend on sign-installer for PRs
+    if: ${{ !(failure() || cancelled()) }}
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: github.ref != 'refs/heads/main'
+        with:
+          name: installer-x86_64
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: github.ref != 'refs/heads/main'
+        with:
+          name: installer-arm64
+
+      - name: Rename Installers
+        if: github.ref != 'refs/heads/main'
+        run: |
+          for f in *.exe.unsigned; do mv "$f" "${f%.exe.unsigned}.exe"; done
+
+      - name: Upload Results
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: installer-signed
+          path: '*.exe'
+
   test-installer:
     name: installer-${{ matrix.image }}
     runs-on: windows-${{ matrix.image }}
-    needs: build-installer
+    needs: after-sign
+    if: ${{ !(failure() || cancelled()) }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -107,7 +204,7 @@ jobs:
 
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: installer-${{ matrix.arch_name }}
+          name: installer-signed
 
       - name: Install
         run: |
@@ -132,7 +229,10 @@ jobs:
   test-docker-sfx:
     name: docker-sfx-${{ matrix.image }}
     runs-on: windows-${{ matrix.image }}
-    needs: build-installer
+    needs: after-sign
+    if: ${{ !(failure() || cancelled()) }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -145,7 +245,7 @@ jobs:
 
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: installer-x86_64
+          name: installer-signed
 
       # https://github.com/actions/runner-images/issues/13729
       - name: Docker issue workaround
@@ -175,7 +275,10 @@ jobs:
   test-sfx:
     name: sfx-${{ matrix.image }}
     runs-on: windows-${{ matrix.image }}
-    needs: build-installer
+    needs: after-sign
+    if: ${{ !(failure() || cancelled()) }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -194,7 +297,7 @@ jobs:
 
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: installer-${{ matrix.arch_name }}
+          name: installer-signed
 
       - name: Install
         run: |
@@ -216,6 +319,31 @@ jobs:
           C:\msys2-install-test\msys64\usr\bin\bash.exe -lc "pacman -Syy"
           C:\msys2-install-test\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm git"
 
+  verify-signed:
+    runs-on: ubuntu-24.04
+    needs: sign-installer
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Install osslsigncode
+        run: sudo apt-get install -y osslsigncode
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: installer-signed
+
+      - name: Verify Signatures
+        run: |
+          FILES=(msys2-base-x86_64-latest.sfx.exe msys2-x86_64-latest.exe msys2-arm64-latest.exe)
+          curl --fail -o \
+              "msft.crt" \
+              "https://www.microsoft.com/pkiops/certs/Microsoft%20Identity%20Verification%20Root%20Certificate%20Authority%202020.crt"
+          openssl x509 -inform DER -in "msft.crt" -out "msft.pem"
+          ARGS=(verify -CAfile "msft.pem" -TSA-CAfile "msft.pem")
+          for FILE in "${FILES[@]}"; do
+              osslsigncode "${ARGS[@]}" -in "$FILE"
+              osslsigncode "${ARGS[@]}" -time "$(date -d "+366 days" +%s)" -in "$FILE"
+          done
+
   upload-nightly:
     permissions:
       contents: write
@@ -224,6 +352,8 @@ jobs:
       - test-docker-sfx
       - test-installer
       - test-sfx
+      - sign-installer
+      - verify-signed
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -235,9 +365,14 @@ jobs:
         with:
           name: installer-arm64
 
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: installer-signed
+
       - name: Upload Installers
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          rm -f *.exe.unsigned
           export DO_NOT_TRACK=true
           gh release upload nightly-x86_64 msys2-* --clobber -R ${{ github.repository }}
