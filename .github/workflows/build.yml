@@ -67,18 +67,17 @@ jobs:
         run: |
           bash make-msys2-installer
 
-      - name: Create 'latest' Variants and Checksums
+      - name: Create 'latest' Variants
+        shell: msys2 {0}
         run: |
           mv msys2-${{ matrix.arch_name }}-[0-9]*.exe msys2-${{ matrix.arch_name }}-latest.exe.unsigned
-          if ("${{ matrix.arch_name }}" -ne "arm64") {
+          if [ "${{ matrix.arch_name }}" != "arm64" ]; then
             mv msys2-base-${{ matrix.arch_name }}-[0-9]*.sfx.exe msys2-base-${{ matrix.arch_name }}-latest.sfx.exe.unsigned
             mv msys2-*.tar.xz msys2-base-${{ matrix.arch_name }}-latest.tar.xz
             mv msys2-*.tar.zst msys2-base-${{ matrix.arch_name }}-latest.tar.zst
-          }
+          fi
           mv msys2-*.packages.txt msys2-base-${{ matrix.arch_name }}-latest.packages.txt
-          sha256sum.exe msys2-* > checksums.tmp
-          cat checksums.tmp
-          mv checksums.tmp msys2-${{ matrix.arch_name }}-checksums.txt
+          { printf 'SHA-256 Filename\n- -\n' && sha256sum msys2-*; } | sed 's/^\([^ ]*\) \(.*\)/|\1|\2|/' > "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Results
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -139,9 +138,7 @@ jobs:
             --oidc-client-id "${AZURE_SIGNING_CLIENT_ID}" \
             --oidc-tenant-id "${AZURE_SIGNING_TENANT_ID}" \
             *.exe
-          sha256sum *.exe > checksums.tmp
-          cat checksums.tmp
-          mv checksums.tmp msys2-signed-checksums.txt
+          { printf 'SHA-256 Filename\n- -\n' && sha256sum *.exe; } | sed 's/^\([^ ]*\) \(.*\)/|\1|\2|/' > "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Results
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
