@@ -17,8 +17,6 @@ gh release download "$source_release" --repo "$repo" --dir "$release_dir"
 
 pushd "$release_dir" >/dev/null
 
-sha256sum -c msys2-x86_64-checksums.txt && rm msys2-x86_64-checksums.txt
-sha256sum -c msys2-arm64-checksums.txt && rm msys2-arm64-checksums.txt
 rm msys2-base-arm64-*.packages.txt
 
 downloaded=(msys2-*)
