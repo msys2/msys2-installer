@@ -107,19 +107,19 @@ jobs:
 
       - name: Download aas-sign
         env:
-          AAS_SIGN_VERSION: 1.1.0
-          AAS_SIGN_CHECKSUM: 7c7d2b155a910b8144ea45ea1f7bda12afe6d749c9477b6d3c20321308e0e9f8
+          AAS_SIGN_BUILD_VERSION: 2026-06-14
+          AAS_SIGN_CHECKSUM: 6c122b815978841d4b9cce9ed403748b3a11a4ebd21d8b93950d8cdd774c1901
         run: |
-          # FIXME: build this ourselves to avoid depending on a third party binary
           curl \
             --fail \
             --silent \
             --show-error \
             --location \
             --output aas-sign \
-            "https://github.com/skeeto/aas-sign/releases/download/v${AAS_SIGN_VERSION}/aas-sign-linux-x86_64"
+            "https://github.com/msys2/aas-sign-build/releases/download/${AAS_SIGN_BUILD_VERSION}/aas-sign"
           echo "${AAS_SIGN_CHECKSUM}  aas-sign" | sha256sum --check
           chmod +x aas-sign
+          ./aas-sign --version
 
       - name: Sign Installers
         env:
