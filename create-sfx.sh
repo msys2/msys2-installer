@@ -5,19 +5,19 @@ set -e
 
 if [ "$MSYSTEM" = "CLANGARM64" ]; then
     ARCH="arm64"
-    CHECKSUM="9bf8e4b93f022df5fd669c6b29397aacbcc05244a435a8f7117c16796c4610d9"
+    CHECKSUM="880d663a10456e213c70107816941113a4260b167c61c79c5fe49235c33fc36e"
 else
     ARCH="x64"
-    CHECKSUM="337eb2af535d1ae752a9b78bfa2c51261c395e5827bd57e8dc0eb93685c588ed"
+    CHECKSUM="e6b3728f0ed2f6fd9f18c11d793ff67a8b1553555f1f8d9b916fe2e7f748ae27"
 fi
 
 # Download and extract https://github.com/mcmilk/7-Zip-zstd
-NAME="7z26.01-zstd-${ARCH}"
+NAME="7z26.02-zstd-${ARCH}"
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 mkdir -p "$DIR/_cache"
 BASE="$DIR/_cache/$NAME"
 if [ ! -f "$BASE.exe" ]; then
-    curl --fail -L "https://github.com/mcmilk/7-Zip-zstd/releases/download/v26.01-v1.5.7-R1/$NAME.exe" -o "$BASE.exe"
+    curl --fail -L "https://github.com/mcmilk/7-Zip-zstd/releases/download/v26.02-v1.5.7-R1/$NAME.exe" -o "$BASE.exe"
 fi
 echo "$CHECKSUM $BASE.exe" | sha256sum --quiet --check
 if [ ! -d "$BASE" ]; then
