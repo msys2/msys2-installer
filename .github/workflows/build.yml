@@ -70,9 +70,9 @@ jobs:
       - name: Create 'latest' Variants
         shell: msys2 {0}
         run: |
+          mv msys2-base-${{ matrix.arch_name }}-[0-9]*.sfx.exe msys2-base-${{ matrix.arch_name }}-latest.sfx.exe.unsigned
           mv msys2-${{ matrix.arch_name }}-[0-9]*.exe msys2-${{ matrix.arch_name }}-latest.exe.unsigned
           if [ "${{ matrix.arch_name }}" != "arm64" ]; then
-            mv msys2-base-${{ matrix.arch_name }}-[0-9]*.sfx.exe msys2-base-${{ matrix.arch_name }}-latest.sfx.exe.unsigned
             mv msys2-*.tar.xz msys2-base-${{ matrix.arch_name }}-latest.tar.xz
             mv msys2-*.tar.zst msys2-base-${{ matrix.arch_name }}-latest.tar.zst
           fi
@@ -282,7 +282,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - arch_name: x86_64
+          - arch_name: arm64
             image: 11-arm
           - arch_name: x86_64
             image: 2022
