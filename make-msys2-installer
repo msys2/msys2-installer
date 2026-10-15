@@ -76,8 +76,11 @@ create_installer() {
 
 dynamicbase_hack() {
   local _runtime="${_newmsys}/usr/bin/msys-2.0.dll"
+  local _host_hash _target_hash
 
-  if ! cmp -s /usr/bin/msys-2.0.dll "${_runtime}"; then
+  _host_hash=$(sha256sum < /usr/bin/msys-2.0.dll)
+  _target_hash=$(sha256sum < "${_runtime}")
+  if [ "${_host_hash}" != "${_target_hash}" ]; then
     echo "Host and target MSYS2 runtimes differ; cannot hardlink them." >&2
     return 1
   fi
