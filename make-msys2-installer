@@ -74,6 +74,25 @@ create_installer() {
   popd > /dev/null
 }
 
+dynamicbase_hack() {
+  local _runtime="${_newmsys}/usr/bin/msys-2.0.dll"
+
+  if ! cmp -s /usr/bin/msys-2.0.dll "${_runtime}"; then
+    echo "Host and target MSYS2 runtimes differ; cannot hardlink them." >&2
+    return 1
+  fi
+
+  # Work around cross-installation ASLR failures by sharing the host DLL.
+  ln /usr/bin/msys-2.0.dll "${_runtime}.tmp"
+  mv -f "${_runtime}.tmp" "${_runtime}"
+
+  "$@"
+
+  # Restore an independent DLL before archiving the target installation.
+  cp "${_runtime}" "${_runtime}.tmp"
+  mv -f "${_runtime}.tmp" "${_runtime}"
+}
+
 create_chroot_system() {
   echo "[Creating chroot system...]"
   rm -Rf "${_newmsysbase}" && mkdir -p "${_newmsys}"
@@ -85,7 +104,7 @@ create_chroot_system() {
 
     pacman -Syu --root "${_newmsys}"
     pacman -S filesystem msys2-runtime --noconfirm --root "${_newmsys}"
-    pacman -S base --noconfirm --root "${_newmsys}"
+    dynamicbase_hack pacman -S base --noconfirm --root "${_newmsys}"
     pacman -Q --root "${_newmsys}" > "${_thisdir}/msys2-base-${_arch_name}-${_date}.packages.txt"
   popd > /dev/null
 }
