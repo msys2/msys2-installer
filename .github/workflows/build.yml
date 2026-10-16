@@ -12,7 +12,7 @@ permissions: {}
 
 jobs:
   zizmor:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     permissions:
       contents: read
@@ -86,7 +86,7 @@ jobs:
           path: msys2-*
 
   sign-installer:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       - build-installer
       - zizmor
@@ -147,7 +147,7 @@ jobs:
           path: '*.exe'
 
   after-sign:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       - build-installer
       - sign-installer
@@ -319,7 +319,7 @@ jobs:
           C:\msys2-install-test\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm git"
 
   verify-signed:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: sign-installer
     if: github.ref == 'refs/heads/main'
     steps:
@@ -354,7 +354,7 @@ jobs:
       - sign-installer
       - verify-signed
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
